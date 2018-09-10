@@ -7,7 +7,7 @@ services:
         image: streampush/streampush
         build: ./app/
         volumes:
-            - ./data:/opt/streampush/data
+            - ./spdata:/opt/streampush/data
         depends_on:
             - relay
             - db
@@ -19,6 +19,6 @@ services:
         image: streampush/relay
         build: ./relay-server/
         volumes:
-            - ./data:/opt/streampush/data
+            - ./spdata:/opt/streampush/data
         ports:
             - "1935:1935"

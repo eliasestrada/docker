@@ -8,10 +8,18 @@ RUN mkdir -p /opt/streampush/data
 VOLUME /opt/streampush/data
 
 RUN apk update && \
-    apk add --virtual .build-deps gcc musl-dev postgresql-dev git openssh && \
-    git clone https://git.ferrara.space/Streampush/Streampush.git && \
-    cp -r ./Streampush/app/* /opt/streampush/app/ && rm -rf ./Streampush && \
-    pip3 install -r /opt/streampush/app/requirements.txt && \
+    apk add --virtual .build-deps gcc musl-dev postgresql-dev git openssh nodejs npm && \
+    npm i -g @angular/cli
+
+RUN git clone https://git.ferrara.space/Streampush/Streampush.git && \
+    cp -r ./Streampush/app/* /opt/streampush/app/ && rm -rf ./Streampush
+
+RUN cd /opt/streampush/app/streampush/frontend/static-src/streampush && \
+    npm i && \
+    ng build && \
+    cd .. && rm -rf ./static-src
+
+RUN pip3 install -r /opt/streampush/app/requirements.txt && \
     apk --purge del .build-deps
 
 COPY start.sh /opt/streampush/app/start.sh

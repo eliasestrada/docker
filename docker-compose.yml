@@ -13,6 +13,8 @@ services:
             - db
         ports:
             - "8000:8000"
+        environment:
+            - DJANGO_SECRET=ThisIsABadSecret
     relay:
         image: streampush/relay
         build: ./relay-server/

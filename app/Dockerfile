@@ -1,6 +1,5 @@
 FROM python:alpine
 
-ENV DJANGO_SECRET=ThisIsNotAGoodSecret
 ENV DJANGO_SETTINGS_MODULE=streampush.settings-prod
 
 RUN mkdir -p /opt/streampush/app
@@ -17,7 +16,7 @@ RUN git clone https://git.ferrara.space/Streampush/Streampush.git && \
 RUN cd /opt/streampush/app/streampush/frontend/static-src/streampush && \
     npm i && \
     ng build && \
-    cd .. && rm -rf ./static-src
+    cd / && rm -rf /opt/streampush/app/streampush/frontend/static-src/
 
 RUN pip3 install -r /opt/streampush/app/requirements.txt && \
     apk --purge del .build-deps

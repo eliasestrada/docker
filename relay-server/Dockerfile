@@ -11,4 +11,5 @@ RUN apk update && \
 
 EXPOSE 1935
 
-CMD ["/usr/bin/relay", "-c", "/opt/streampush/data/relay"]
+WORKDIR /opt/streampush/data/
+CMD ["/usr/bin/relay"]

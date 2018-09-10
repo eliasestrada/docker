@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  app:
+    build: ./app/
+    volumes:
+      - ./data:/opt/streampush/data
+    depends_on:
+      - relay
+    ports:
+      - "8000:8000"
+  relay:
+    build: ./relay-server/
+    volumes:
+    - ./data:/opt/streampush/data
+    ports:
+      - "1935:1935"

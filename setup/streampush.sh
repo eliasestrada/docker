@@ -36,7 +36,31 @@ then
         fi
     fi
 
-    eval "echo \"$(cat docker-compose.yml.tplt)\" > docker-compose.yml"
+    cat > docker-compose.yml <<EOL
+version: '3'
+
+services:
+    db:
+        image: redis
+    app:
+        image: streampush/streampush
+        volumes:
+            - ./spdata:/opt/streampush/data
+        depends_on:
+            - relay
+            - db
+        ports:
+            - "$APP_PORT:8000"
+        environment:
+            - DJANGO_SECRET=$APP_SECRET
+    relay:
+        image: streampush/relay
+        volumes:
+            - ./spdata:/opt/streampush/data
+        ports:
+            - "$RTMP_PORT:1935"
+EOL
+
     echo "Streampush is configured. Run \`streampush.sh start\` to start Streampush."
 elif [ "$1" == "start" ]
 then

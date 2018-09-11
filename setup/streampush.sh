@@ -6,10 +6,7 @@ docker-compose --version
 
 if [ "$1" == "config" ]
 then
-    # Get the docker-compose.yml file (or generate it)
-    # Make some env var config changes based upon some user input
-    # Run docker-compose pull
-    echo "Streampush Docker configuration"
+    echo "Streampush configuration"
 
     APP_PORT=8000
     RTMP_PORT=1935
@@ -19,7 +16,7 @@ then
     read USE_DEFAULTS
     if [ "$USE_DEFAULTS" == "n" ]
     then
-        echo -n "HTTP Port (Default: 8000): "
+        echo -n "HTTP Port (Default=8000): "
         read APP_PORT
 
         if [ "$APP_PORT" == "" ]
@@ -27,7 +24,7 @@ then
             APP_PORT=8000
         fi
 
-        echo -n "RTMP Port (Default: 1935): "
+        echo -n "RTMP Port (Default=1935): "
         read RTMP_PORT
 
         if [ "$APP_PORT" == "" ]
@@ -61,7 +58,7 @@ services:
             - "$RTMP_PORT:1935"
 EOL
 
-    echo "Streampush is configured. Run \`streampush.sh start\` to start Streampush."
+    echo "Streampush is configured. Run \`./streampush.sh start\` to start Streampush."
 elif [ "$1" == "start" ]
 then
     # Run docker-compose up

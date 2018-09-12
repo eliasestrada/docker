@@ -79,6 +79,11 @@ EOL
         SP_VHOST="- VIRTUAL_HOST=$SP_FQDN"
         SP_LEHOST="- LETSENCRYPT_HOST=$SP_FQDN"
         SP_LEEMAIL="- LETSENCRYPT_EMAIL=$SP_LEMAIL_IN"
+
+        SP_DEPENDS=`cat <<EOL
+        depends_on:
+            - ssl
+EOL`
     fi
 
     cat > docker-compose.yml <<EOL
@@ -104,8 +109,7 @@ $SP_NGINX
             $SP_VHOST
             $SP_LEHOST
             $SP_LEEMAIL
-        depends_on:
-            - ssl
+$SP_DEPENDS
     relay:
         image: streampush/relay
         volumes:

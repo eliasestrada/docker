@@ -10,8 +10,8 @@ RUN apk update && \
     apk add --virtual .build-deps gcc musl-dev postgresql-dev git openssh nodejs npm && \
     npm i -g @angular/cli
 
-RUN git clone https://git.ferrara.space/Streampush/Streampush.git && \
-    cp -r ./Streampush/app/* /opt/streampush/app/ && rm -rf ./Streampush
+RUN git clone https://github.com/streampush/streampush.git && \
+    cp -r ./streampush/app/* /opt/streampush/app/ && rm -rf ./streampush
 
 RUN cd /opt/streampush/app/streampush/frontend/static-src/streampush && \
     npm i && \

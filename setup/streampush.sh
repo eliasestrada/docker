@@ -8,8 +8,8 @@ if [ "$1" == "config" ]
 then
     echo "Streampush configuration:\n\t1) App ports\n\t2) Nginx config\n\t3) Done"
 
-    APP_PORT=8000
-    RTMP_PORT=1935
+    SP_PORT=8000
+    SP_RTMP_PORT=1935
     APP_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 128 | head -n 1)
 
     echo "App ports"
@@ -20,35 +20,38 @@ then
         echo -n "HTTP Port (Default=8000): "
         read APP_PORT
 
-        if [ "$APP_PORT" == "" ]
+        if [ "$SP_PORT" == "" ]
         then
-            APP_PORT=8000
+            SP_PORT=8000
         fi
 
         echo -n "RTMP Port (Default=1935): "
-        read RTMP_PORT
+        read SP_RTMP_PORT
 
-        if [ "$APP_PORT" == "" ]
+        if [ "$SP_RTMP_PORT" == "" ]
         then
-            RTMP_PORT=1935
+            SP_RTMP_PORT=1935
         fi
     fi
 
     echo "Nginx config"
-    echo -n "Would you like to setup an nginx reverse proxy for streampush with SSL? This is recommended for publicly-accesible installs. (Y/n)"
+    echo -n "Would you like to setup an nginx reverse proxy for streampush with SSL?\nThis is recommended for publicly-accesible installs. (Y/n): "
     read REV_PRXY
     if [ "$REV_PRXY" != "n" ]
     then
-        echo -n "Please enter the FQDN of your installation (ex: streampush.io): "
-        read FQDN
+        SP_VOLUMES=`cat <<EOL
+volumes:
+    nginxhtml:
+    nginxvhost:
+EOL`
 
         SP_NGINX=`cat <<EOL
-nginx:
+    nginx:
         image: jwilder/nginx-proxy
         volumes:
             - ./spdata/certs:/etc/nginx/certs:ro
-            - /etc/nginx/vhost.d/
-            - /usr/share/nginx/html
+            - nginxvhost:/etc/nginx/vhost.d/
+            - nginxhtml:/usr/share/nginx/html
             - /var/run/docker.sock:/tmp/docker.sock:ro
         labels:
             - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
@@ -59,24 +62,32 @@ nginx:
         image: jrcs/letsencrypt-nginx-proxy-companion
         volumes:
             - ./spdata/certs:/etc/nginx/certs:rw
+            - nginxvhost:/etc/nginx/vhost.d/
+            - nginxhtml:/usr/share/nginx/html
             - /var/run/docker.sock:/var/run/docker.sock:ro
-            - /etc/nginx/vhost.d/
-            - /usr/share/nginx/html
         depends_on:
             - nginx
 EOL
 `
 
-        SP_VHOST="- VIRTUAL_HOST=${FQDN}"
-        SP_LEHOST="- LETSENCRYPT_HOST=${FQDN}"
-        SP_LEEMAIL="- LETSENCRYPT_EMAIL=fakeemail@asdasdasdadsdasd.com"
+        echo -n "Please enter the FQDN of your installation (ex: sp.ferrara.space): "
+        read SP_FQDN
+
+        echo -n "Please enter your email for Let's Encrypt: "
+        read SP_LEMAIL_IN
+
+        SP_VHOST="- VIRTUAL_HOST=$SP_FQDN"
+        SP_LEHOST="- LETSENCRYPT_HOST=$SP_FQDN"
+        SP_LEEMAIL="- LETSENCRYPT_EMAIL=$SP_LEMAIL_IN"
     fi
 
     cat > docker-compose.yml <<EOL
 version: '3'
 
+$SP_VOLUMES
+
 services:
-    ${SP_NGINX}
+$SP_NGINX
     db:
         image: redis
     app:
@@ -87,7 +98,7 @@ services:
             - relay
             - db
         ports:
-            - "$APP_PORT:8000"
+            - "$SP_PORT:8000"
         environment:
             - DJANGO_SECRET=$APP_SECRET
             $SP_VHOST
@@ -100,7 +111,7 @@ services:
         volumes:
             - ./spdata:/opt/streampush/data
         ports:
-            - "$RTMP_PORT:1935"
+            - "$SP_RTMP_PORT:1935"
 EOL
 
     echo "Streampush is configured. Run \`./streampush.sh start\` to start Streampush."

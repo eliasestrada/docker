@@ -15,7 +15,7 @@ RUN git clone https://github.com/streampush/streampush.git && \
 
 RUN cd /opt/streampush/app/streampush/frontend/static-src/streampush && \
     npm i && \
-    ng build && \
+    npm run-script build && \
     cd / && rm -rf /opt/streampush/app/streampush/frontend/static-src/
 
 RUN pip3 install -r /opt/streampush/app/requirements.txt && \

@@ -1,4 +1,5 @@
 .idea/
 data/
+spdata/
 setup/spdata
 setup/docker-compose.yml

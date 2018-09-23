@@ -91,7 +91,7 @@ version: '3'
 volumes:
     streampush:
     streampushrelay:
-    $SP_XTRAVOLUMES
+$SP_XTRAVOLUMES
 
 services:
 $SP_NGINX

@@ -39,8 +39,7 @@ then
     read REV_PRXY
     if [ "$REV_PRXY" != "n" ]
     then
-        SP_VOLUMES=`cat <<EOL
-volumes:
+        SP_XTRAVOLUMES=`cat <<EOL
     nginxhtml:
     nginxvhost:
 EOL`
@@ -89,7 +88,10 @@ EOL`
     cat > docker-compose.yml <<EOL
 version: '3'
 
-$SP_VOLUMES
+volumes:
+    streampush:
+    streampushrelay:
+    $SP_XTRAVOLUMES
 
 services:
 $SP_NGINX
@@ -98,7 +100,7 @@ $SP_NGINX
     app:
         image: streampush/streampush
         volumes:
-            - ./spdata:/opt/streampush/data
+            - streampush:/opt/streampush/data
         depends_on:
             - relay
             - db
@@ -113,7 +115,7 @@ $SP_DEPENDS
     relay:
         image: streampush/relay
         volumes:
-            - ./spdata:/opt/streampush/data
+            - streampush:/opt/streampush/data
         ports:
             - "$SP_RTMP_PORT:1935"
 EOL
